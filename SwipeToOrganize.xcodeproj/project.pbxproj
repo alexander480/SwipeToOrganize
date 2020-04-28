@@ -3,27 +3,34 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		0A492E9D2455484900524478 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A492E9C2455484900524478 /* AppDelegate.swift */; };
 		0A492E9F2455484900524478 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A492E9E2455484900524478 /* SceneDelegate.swift */; };
-		0A492EA12455484900524478 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A492EA02455484900524478 /* ViewController.swift */; };
+		0A492EA12455484900524478 /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A492EA02455484900524478 /* MainVC.swift */; };
 		0A492EA42455484900524478 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A492EA22455484900524478 /* Main.storyboard */; };
 		0A492EA62455484D00524478 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A492EA52455484D00524478 /* Assets.xcassets */; };
 		0A492EA92455484D00524478 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A492EA72455484D00524478 /* LaunchScreen.storyboard */; };
+		0A492EB22455489A00524478 /* VerticalCardSwiper in Frameworks */ = {isa = PBXBuildFile; productRef = 0A492EB12455489A00524478 /* VerticalCardSwiper */; };
+		0A492EB724554AFD00524478 /* PhotoCardCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A492EB624554AFD00524478 /* PhotoCardCell.xib */; };
+		0A492EB924554BA300524478 /* PhotoCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A492EB824554BA300524478 /* PhotoCardCell.swift */; };
+		0A7B7D7D24564D820079625C /* PKExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B7D7C24564D820079625C /* PKExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0A492E992455484900524478 /* SwipeToOrganize.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwipeToOrganize.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A492E9C2455484900524478 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0A492E9E2455484900524478 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		0A492EA02455484900524478 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		0A492EA02455484900524478 /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
 		0A492EA32455484900524478 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0A492EA52455484D00524478 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0A492EA82455484D00524478 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0A492EAA2455484D00524478 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0A492EB624554AFD00524478 /* PhotoCardCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoCardCell.xib; sourceTree = "<group>"; };
+		0A492EB824554BA300524478 /* PhotoCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCardCell.swift; sourceTree = "<group>"; };
+		0A7B7D7C24564D820079625C /* PKExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PKExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A492EB22455489A00524478 /* VerticalCardSwiper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,15 +64,66 @@
 		0A492E9B2455484900524478 /* SwipeToOrganize */ = {
 			isa = PBXGroup;
 			children = (
-				0A492E9C2455484900524478 /* AppDelegate.swift */,
-				0A492E9E2455484900524478 /* SceneDelegate.swift */,
-				0A492EA02455484900524478 /* ViewController.swift */,
-				0A492EA22455484900524478 /* Main.storyboard */,
-				0A492EA52455484D00524478 /* Assets.xcassets */,
-				0A492EA72455484D00524478 /* LaunchScreen.storyboard */,
-				0A492EAA2455484D00524478 /* Info.plist */,
+				0A492EB4245548BD00524478 /* Core */,
+				0A492EB3245548B300524478 /* User Interface */,
+				0A492EB5245548C400524478 /* Main */,
 			);
 			path = SwipeToOrganize;
+			sourceTree = "<group>";
+		};
+		0A492EB3245548B300524478 /* User Interface */ = {
+			isa = PBXGroup;
+			children = (
+				0A492EA72455484D00524478 /* LaunchScreen.storyboard */,
+				0A492EA22455484900524478 /* Main.storyboard */,
+				0A492EA52455484D00524478 /* Assets.xcassets */,
+			);
+			path = "User Interface";
+			sourceTree = "<group>";
+		};
+		0A492EB4245548BD00524478 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				0A492E9C2455484900524478 /* AppDelegate.swift */,
+				0A492E9E2455484900524478 /* SceneDelegate.swift */,
+				0A492EAA2455484D00524478 /* Info.plist */,
+				0A7B7D7C24564D820079625C /* PKExtensions.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		0A492EB5245548C400524478 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				0A7B7D7824554D530079625C /* View Controllers */,
+				0A7B7D7924554D5C0079625C /* Cards */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		0A492EBA24554BAC00524478 /* PhotoCard */ = {
+			isa = PBXGroup;
+			children = (
+				0A492EB824554BA300524478 /* PhotoCardCell.swift */,
+				0A492EB624554AFD00524478 /* PhotoCardCell.xib */,
+			);
+			path = PhotoCard;
+			sourceTree = "<group>";
+		};
+		0A7B7D7824554D530079625C /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				0A492EA02455484900524478 /* MainVC.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		0A7B7D7924554D5C0079625C /* Cards */ = {
+			isa = PBXGroup;
+			children = (
+				0A492EBA24554BAC00524478 /* PhotoCard */,
+			);
+			path = Cards;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -83,6 +142,9 @@
 			dependencies = (
 			);
 			name = SwipeToOrganize;
+			packageProductDependencies = (
+				0A492EB12455489A00524478 /* VerticalCardSwiper */,
+			);
 			productName = SwipeToOrganize;
 			productReference = 0A492E992455484900524478 /* SwipeToOrganize.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +173,9 @@
 				Base,
 			);
 			mainGroup = 0A492E902455484900524478;
+			packageReferences = (
+				0A492EB02455489A00524478 /* XCRemoteSwiftPackageReference "VerticalCardSwiper" */,
+			);
 			productRefGroup = 0A492E9A2455484900524478 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -127,6 +192,7 @@
 			files = (
 				0A492EA92455484D00524478 /* LaunchScreen.storyboard in Resources */,
 				0A492EA62455484D00524478 /* Assets.xcassets in Resources */,
+				0A492EB724554AFD00524478 /* PhotoCardCell.xib in Resources */,
 				0A492EA42455484900524478 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,8 +204,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A492EA12455484900524478 /* ViewController.swift in Sources */,
+				0A492EA12455484900524478 /* MainVC.swift in Sources */,
+				0A7B7D7D24564D820079625C /* PKExtensions.swift in Sources */,
 				0A492E9D2455484900524478 /* AppDelegate.swift in Sources */,
+				0A492EB924554BA300524478 /* PhotoCardCell.swift in Sources */,
 				0A492E9F2455484900524478 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -286,7 +354,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VZ4LX93GR9;
-				INFOPLIST_FILE = SwipeToOrganize/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/SwipeToOrganize/Core/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -304,7 +372,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VZ4LX93GR9;
-				INFOPLIST_FILE = SwipeToOrganize/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/SwipeToOrganize/Core/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -338,6 +406,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0A492EB02455489A00524478 /* XCRemoteSwiftPackageReference "VerticalCardSwiper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JoniVR/VerticalCardSwiper";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0A492EB12455489A00524478 /* VerticalCardSwiper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A492EB02455489A00524478 /* XCRemoteSwiftPackageReference "VerticalCardSwiper" */;
+			productName = VerticalCardSwiper;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0A492E912455484900524478 /* Project object */;
 }

@@ -6,169 +6,68 @@
 //  Copyright © 2020 Alexander Lester. All rights reserved.
 //
 
+
+// Make Sure To Add Asset ID To Proccessed Array After Performing setFavorite, addToAlbum, etc. Functions.
+
 import Foundation
 import UIKit
 import Photos
 
 import VerticalCardSwiper
 
-var additionalLogging = false
+let cellWidth: CGFloat = 280
+var additionalLogging = true
 
 class MainVC: UIViewController {
 	
-	var assets: [PHAsset]?
-	var proccessedAssets = [PHAsset]()
+	var photos = [Photo]()
+	var albums = [Album]()
 	
-	var lastIndex: Int?
+	var selectedPhoto: Photo?
+	
+	let helper = PHHelper()
+	
+	@IBOutlet weak var deleteSideBar: View!
+	@IBOutlet weak var keepSideBar: View!
 	
 	@IBOutlet weak var cardSwiper: VerticalCardSwiper!
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(true)
-	}
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
         
+		// Setup cardSwiper
+		
 		self.cardSwiper.delegate = self
 		self.cardSwiper.datasource = self
 		
-		// self.cardSwiper.isSideSwipingEnabled = true
+		self.cardSwiper.verticalCardSwiperView.isPagingEnabled = false
+		self.cardSwiper.verticalCardSwiperView.decelerationRate = .normal
 		
 		self.cardSwiper.register(nib: UINib(nibName: "PhotoCardCell", bundle: nil), forCellWithReuseIdentifier: "PhotoCardCell")
 		
-		self.fetchPhotos()
-	}
-
-	// MARK: Photos Functions
-	
-	// Fetch Photos After Checking Authorization
-	func fetchPhotos() {
-		self.checkAuthorization { (isAuthorized) in
-			if isAuthorized {
-				let options = PHFetchOptions()
-					options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-				
-				let fetchResult = PHAsset.fetchAssets(with: .image, options: options)
-				let fetchedAssets = fetchResult.objects(at: IndexSet(integersIn: 0...fetchResult.count - 1))
-				self.assets = fetchedAssets.filter({ (asset) -> Bool in
-					self.proccessedAssets.contains(asset) == false
-				})
-				
-				DispatchQueue.main.async { self.cardSwiper.reloadData() }
-			}
-			else {
-				// Present "Please Authorize" Alert Here
-			}
-		}
-	}
-	
-	func updateFetchedPhotos(removeIndex: Int) {
-		self.checkAuthorization { (isAuthorized) in
-			if isAuthorized {
-				let options = PHFetchOptions()
-					options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-				
-				let fetchResult = PHAsset.fetchAssets(with: .image, options: options)
-				let fetchedAssets = fetchResult.objects(at: IndexSet(integersIn: 0...fetchResult.count - 1))
-				self.assets = fetchedAssets.filter({ (asset) -> Bool in
-					self.proccessedAssets.contains(asset) == false
-				})
-				
-				DispatchQueue.main.async { self.cardSwiper.deleteCards(at: [removeIndex]) }
-			}
-			else {
-				// Present "Please Authorize" Alert Here
-			}
-		}
-	}
-	
-	
-	// Check Photo Library Authorization
-	private func checkAuthorization(completion: @escaping (Bool) -> ()) {
-		PHPhotoLibrary.requestAuthorization { (status) in
-			switch status {
-				case .authorized:
-					print("[INFO] Photo Library Access Authorized")
-					completion(true)
-				case .denied, .restricted:
-					print("[WARNING] Photo Library Authorization Denied.")
-					completion(false)
-				case .notDetermined:
-					print("[WARNING] Photo Library Authorization Not Yet Determined.")
-					completion(false)
-				@unknown default:
-					print("[ERROR] Unknown Error Occured While Requesting Authorization.")
-					completion(false)
-			}
-		}
-	}
-	
-	private func setFavorite(_ to: Bool, _ asset: PHAsset) {
-		PHPhotoLibrary.shared().performChanges({ let req = PHAssetChangeRequest(for: asset); req.isFavorite = to }) { (didToggle, error) in
-			if let err = error {
-				print("[ERROR] Unable To Set 'Favorite' Attribute To \(to). [MESSAGE] \(err.localizedDescription)");
-				// Present "Unable To Favorite/Remove From Favorites" Alert Here
-			}
-			else if didToggle {
-				print("[SUCCESS] Successfully Set 'Favorite' Attribute To \(to).")
-				// Maybe Present A Small 'Toast' Notification
-			}
-		}
-	}
-	
-	private func hide(_ asset: PHAsset) {
-		PHPhotoLibrary.shared().performChanges({ let req = PHAssetChangeRequest(for: asset); req.isHidden = true }) { (didHide, error) in
-			if let err = error {
-				print("[ERROR] Unable To Hide Photo From Library. [MESSAGE] \(err.localizedDescription)");
-				// Present "Unable To Hide" Alert Here
-			}
-			else if didHide {
-				print("[SUCCESS] Successfully Hid Photo From Library.")
-				// Maybe Present A Small 'Toast' Notification
-			}
-		}
-	}
-	
-	private func delete(asset: PHAsset, index: Int) {
-		let assetArr = [asset] as NSArray
-		PHPhotoLibrary.shared().performChanges({ PHAssetChangeRequest.deleteAssets(assetArr) }) { (didDelete, error) in
-			if let err = error {
-				print("[ERROR] Unable To Delete Photo From Library. [MESSAGE] \(err.localizedDescription)")
-				
-				// Present "Unable To Delete" Alert Here
-			}
-			else if didDelete {
-				print("[SUCCESS] Successfully Deleted Photo From Library.")
-				
-				// Below Line MUST Be Ran On The Main Thread
-				// self.lastIndex = self.cardSwiper.focussedCardIndex
-				
-				self.updateFetchedPhotos(removeIndex: index)
-
-				// self.cardSwiper.reloadData()
-	
-				// self.cardSwiper.scrollToCard(at: self.lastIndex ?? 0, animated: false)
-				
-				// Maybe Present A Small 'Toast' Notification
-				// Inform User That They Need To Go Into Recently Deleted
-			}
-		}
-	}
-	
-	private func skip(index: Int) {
-		self.proccessedAssets.append(self.assets![index])
-		self.updateFetchedPhotos(removeIndex: index)
+		// Display Loading Modal
 		
-		/*
-		DispatchQueue.main.async {
-			// let lastIndex = self.cardSwiper.focussedCardIndex ?? 0
-			// self.assets?.remove(at: index)
-			self.cardSwiper.deleteCards(at: [index])
-			// self.cardSwiper.reloadData()
+		let loadingView = LoadingView()
+			loadingView.show(self.view)
+		
+		self.view.displayToast("Fetching Photo Library")
+		
+		// Fetch Photos
+		
+		self.helper.fetchPhotos { (photos) in
+			self.photos = photos
 			
+			DispatchQueue.main.async {
+				self.cardSwiper.reloadData()
+				self.cardSwiper.layoutSubviews()
+				
+				loadingView.hide()
+			}
 		}
-		*/
+		
+		// Fetch Albums
+		
+		self.helper.fetchAlbums { (albums) in self.albums = albums }
 	}
 }
 
@@ -176,44 +75,201 @@ extension MainVC: VerticalCardSwiperDelegate, VerticalCardSwiperDatasource {
 	func willSwipeCardAway(card: CardCell, index: Int, swipeDirection: SwipeDirection) {
 		switch swipeDirection {
 			case .Left:
-				if additionalLogging { print("[INFO] Card Swiped Left") }
-				if let assetToDelete = self.assets?[index] { self.delete(asset: assetToDelete, index: index) }
+				self.photos[index].delete()
+				self.photos.remove(at: index)
 			case .Right:
-				if additionalLogging { print("[INFO] Card Swiped Right") }
-				// self.assets = Array(newAssets!)
-				self.skip(index: index)
+				self.helper.addProccessedID(self.photos[index].id)
+				self.photos.remove(at: index)
+			case .None:
+				if additionalLogging { print("[INFO] willSwipeCardAway Called. SwipeDirection == .None") }
+		}
+	}
+	
+	func didSwipeCardAway(card: CardCell, index: Int, swipeDirection: SwipeDirection) {
+		switch swipeDirection {
+			case .Left:
+				DispatchQueue.main.async {
+					self.cardSwiper.deleteCards(at: [index])
+					self.cardSwiper.reloadData()
+					self.cardSwiper.layoutSubviews()
+				}
+			case .Right:
+				DispatchQueue.main.async {
+					self.cardSwiper.deleteCards(at: [index])
+					self.cardSwiper.reloadData()
+					self.cardSwiper.layoutSubviews()
+				}
 			case .None:
 				if additionalLogging { print("[INFO] didSwipeCardAway Called. SwipeDirection == .None") }
 		}
 	}
 	
+	func didTapCard(verticalCardSwiperView: VerticalCardSwiperView, index: Int) {
+		
+		// MARK: Scroll To Card
+		
+		// self.cardSwiper.scrollToCard(at: index, animated: true)
+		
+		// MARK: Present ActionView
+		
+		let actionFrame = self.view.frame.inset(by: UIEdgeInsets(top: 55, left: 55, bottom: 55, right: 55))
+		let actionView = ActionView(frame: actionFrame, photo: self.photos[index])
+		
+		
+		self.view.addSubview(actionView)
+		self.view.bringSubviewToFront(actionView)
+		
+		/*
+		let addToView = AddToView(frame: self.view.frame, photo: self.photos[index])
+		
+		// Add UIView
+		self.view.addSubview(addToView)
+		self.view.bringSubviewToFront(addToView)
+		*/
+		/*
+		self.photos[index].fetchImage(forWidth: self.cardSwiper.frame.width) { (image) in
+			self.presentFullScreenViewer(image: image)
+		}
+		*/
+	}
+	
+	private func presentFullScreenViewer(image: UIImage) {
+		let image = image.resize(targetSize: CGSize(width: self.view.frame.size.width - 40, height: self.view.frame.size.height - 40))
+		let centerPoint = CGPoint(x: (self.view.frame.size.width / 2) - (image.size.width / 2), y: (self.view.frame.size.height / 2) - (image.size.height / 2))
+		
+		let imageView = UIImageView()
+			imageView.frame = CGRect(origin: centerPoint, size: image.size)
+			imageView.image = image
+			imageView.contentMode = .scaleToFill
+		
+		let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+			blurView.frame = view.bounds
+			blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+		
+		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeViewer(sender:)))
+		self.view.addGestureRecognizer(tapGesture)
+		
+		DispatchQueue.main.async {
+			self.view.addSubview(blurView)
+			self.view.addSubview(imageView)
+		}
+	}
+	
+	@objc func closeViewer(sender: UIGestureRecognizer) {
+		print("closeViewer Called.")
+		for subview in self.view.subviews {
+			if subview is UIVisualEffectView {
+				subview.removeFromSuperview()
+				print("Blur View Removed")
+			}
+			else if subview is UIImageView {
+				subview.removeFromSuperview()
+				print("Image Viewer Removed")
+			}
+		}
+		
+		self.view.removeGestureRecognizer(sender)
+	}
+	
+	// MARK: Animate Side Bars
+	/*
+	func didScroll(verticalCardSwiperView: VerticalCardSwiperView) {
+		if let currentIndex = self.cardSwiper.focussedCardIndex {
+			if let currentCard = self.cardForItemAt(verticalCardSwiperView: verticalCardSwiperView, cardForItemAt: currentIndex) as? PhotoCardCell {
+				let imageFrame = currentCard.imageView.frame
+				DispatchQueue.main.async {
+					self.deleteSideBar.animateTo(frame: CGRect(x: 0, y: imageFrame.minY, width: 35, height: imageFrame.height), withDuration: 2, completion: nil)
+					self.keepSideBar.animateTo(frame: CGRect(x: 379, y: imageFrame.minY, width: 35, height: imageFrame.height), withDuration: 2, completion: nil)
+				}
+				
+			}
+		}
+		
+	}
+	*/
+	
+	func didHoldCard(verticalCardSwiperView: VerticalCardSwiperView, index: Int, state: UIGestureRecognizer.State) {
+		let photo = self.photos[index]
+		
+		let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+		let favoriteAction = UIAlertAction(title: "Favorite", style: .default) { (action) in
+			photo.setFavorite(true) { (didSet) in
+				if (didSet) { print("[SUCCESS] Successfully Favorited Photo.") } else { print("[ERROR] Failed To Favorite Photo.") }
+				DispatchQueue.main.async { actionSheet.dismiss(animated: true, completion: nil) }
+			}
+		}
+		
+		let unfavoriteAction = UIAlertAction(title: "Unfavorite", style: .default) { (action) in
+			photo.setFavorite(false) { (didSet) in
+				if (didSet) {
+					print("[SUCCESS] Successfully Unfavorited Photo.")
+					
+				}
+				else {
+					print("[ERROR] Failed To Unfavorite Photo.")
+					
+				}
+				
+				DispatchQueue.main.async { actionSheet.dismiss(animated: true, completion: nil) }
+			}
+		}
+		
+		let hideAction = UIAlertAction(title: "Hide", style: .default) { (action) in
+			photo.setHide(true) { (didSet) in
+				if (didSet) {
+					print("[SUCCESS] Successfully Hid Photo.")
+					self.photos.remove(at: index)
+				}
+				else {
+					print("[ERROR] Failed To Hid Photo.")
+					
+				}
+				
+				DispatchQueue.main.async { actionSheet.dismiss(animated: true, completion: nil) }
+			}
+		}
+		
+		let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { (action) in
+			photo.delete()
+			
+			DispatchQueue.main.async { actionSheet.dismiss(animated: true, completion: nil) }
+		}
+		
+		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
+			DispatchQueue.main.async { actionSheet.dismiss(animated: true, completion: nil) }
+		}
+		
+		if photo.isFavorite { actionSheet.addAction(unfavoriteAction) } else { actionSheet.addAction(favoriteAction) }
+		
+		actionSheet.addAction(hideAction)
+		actionSheet.addAction(deleteAction)
+		actionSheet.addAction(cancelAction)
+		
+		DispatchQueue.main.async { self.present(actionSheet, animated: true, completion: nil) }
+	}
+	
 	func numberOfCards(verticalCardSwiperView: VerticalCardSwiperView) -> Int {
-		if let assets = self.assets { return assets.count } else { return 0 }
+		// if let assets = self.assets { return assets.count } else { return 0 }
+		return self.photos.count
 	}
 	
 	func cardForItemAt(verticalCardSwiperView: VerticalCardSwiperView, cardForItemAt index: Int) -> CardCell {
 		let cell = verticalCardSwiperView.dequeueReusableCell(withReuseIdentifier: "PhotoCardCell", for: index) as! PhotoCardCell
 		
-		if let asset = self.assets?[index] {
-			print("[INFO] Successfully Validated Image Asset.")
+		self.photos[index].fetchImage(forWidth: self.cardSwiper.frame.width) { (image) in
+			print("[SUCCESS] Successfully Fetched/Set Image.")
 			
-			if asset.isFavorite { /* Change Favorite Button Image */ }
-			
-			cell.imageView.fetchImage(asset: asset, contentMode: .default, targetSize: cell.frame.size)
-			
-			return cell
+			let roundedImage = image.cornerRadius(10.0)
+			cell.imageView.image = roundedImage
 		}
-		else {
-			print("[ERROR] Unable To Validate PHAsset Array.");
-			cell.imageView.image = #imageLiteral(resourceName: "Error Image")
-			
-			return cell
-		}
+		
+		// if photo.isFavorite { cell.favoriteButton.setImage(#imageLiteral(resourceName: "Favorite Button (Filled)"), for: .normal) } else { cell.favoriteButton.setImage(#imageLiteral(resourceName: "Favorite Button (Not Filled)"), for: .normal) }
+		// if photo.isHidden { cell.hideButton.setImage(#imageLiteral(resourceName: "Show"), for: .normal) } else { cell.hideButton.setImage(#imageLiteral(resourceName: "Hide Button"), for: .normal) }
+		
+		return cell
 	}
 	
-	/* func sizeForItem(verticalCardSwiperView: VerticalCardSwiperView, index: Int) -> CGSize {
-        return CGSize(width: verticalCardSwiperView.frame.width * 0.75, height: verticalCardSwiperView.frame.height * 0.75)
-    } */
-	
-	
+	func sizeForItem(verticalCardSwiperView: VerticalCardSwiperView, index: Int) -> CGSize {
+		return self.photos[index].asset.scaledSize(forWidth: self.cardSwiper.frame.width)
+	}
 }

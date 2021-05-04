@@ -49,6 +49,7 @@
 		0AD3A7F124BEA177006B253B /* QueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QueueManager.swift; path = "SwipeToOrganize/Main/View Controllers/QueueManager.swift"; sourceTree = SOURCE_ROOT; };
 		0ADBA61C246B94EE0018E0C1 /* SwipeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeVC.swift; sourceTree = "<group>"; };
 		0ADBA61E246B98170018E0C1 /* CardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCell.swift; sourceTree = "<group>"; };
+		0AEB9CB92641574800E5E7DC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0AFEEE87247CC28D007B0E0A /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,6 +76,7 @@
 		0A492E902455484900524478 = {
 			isa = PBXGroup;
 			children = (
+				0AEB9CB92641574800E5E7DC /* README.md */,
 				0A21675824987279007665A9 /* SwipeToOrganizePlayground.playground */,
 				0A492E9B2455484900524478 /* SwipeToOrganize */,
 				0A492E9A2455484900524478 /* Products */,

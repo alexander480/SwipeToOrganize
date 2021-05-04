@@ -6,6 +6,8 @@
 //  Copyright © 2020 Alexander Lester. All rights reserved.
 //
 
+import ALExt
+
 import UIKit
 import Photos
 
@@ -14,9 +16,8 @@ class Album: NSObject {
 	var name: String
 	
 	var imageCount: Int
-	
-	var hasThumbnail: Bool = false
-	var thumbnail: UIImage
+
+	var thumbnail: UIImage?
 	
 	init(collection: PHAssetCollection) {
 		self.collection = collection
@@ -31,15 +32,10 @@ class Album: NSObject {
 		super.init()
 		
 		// Fetch Actual Thumbnail After Init
-		self.fetchThumbnail(size: nil) { (thumbnail) in
-			if let image = thumbnail {
-				self.hasThumbnail = true
-				self.thumbnail = image
-			}
-		}
+		self.fetchThumbnail(size: nil) { (thumbnail) in if let image = thumbnail { self.thumbnail = image } }
 	}
 	
-	func add(_ photo: Photo, completion: @escaping (Bool) -> ()) {
+	func add(_ photo: Asset, completion: @escaping (Bool) -> ()) {
 		PHPhotoLibrary.shared().performChanges({
 			let changeReq = PHAssetCollectionChangeRequest.init(for: self.collection)
 				changeReq?.addAssets([photo.asset] as NSArray)
@@ -78,10 +74,11 @@ class Album: NSObject {
 				reqOptions.resizeMode = .exact
 				reqOptions.normalizedCropRect = CGRect(origin: CGPoint(x: 0, y: 0), size: targetSize)
 			
-			manager.requestImage(for: firstAsset, targetSize: targetSize, contentMode: .aspectFill, options: reqOptions) { (image, info) in
+            manager.requestImage(for: firstAsset, targetSize: targetSize, contentMode: .default, options: reqOptions) { (image, info) in
 				if let thumbnail = image {
 					print("[INFO] Successfully Fetched Thumbnail Image For Collection: \(self.name).")
-					completion(thumbnail)
+                    let cropped = thumbnail.resize(targetSize: CGSize(width: 100, height: 100))
+					completion(cropped)
 				}
 				else {
 					print("[ERROR] An Error Occured While Fetching Thumbnail Image For Collection: \(self.name)")

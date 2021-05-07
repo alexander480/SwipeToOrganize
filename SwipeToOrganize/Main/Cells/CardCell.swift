@@ -267,7 +267,7 @@ class CardCell: UICollectionViewCell {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if self.isDragEnabled { self.dismissAlbumTray() }
+        if self.isDragEnabled { self.handleAlbumTray() }
     }
     
     deinit {
@@ -337,38 +337,32 @@ extension CardCell {
         }
     }
     
-    private func dismissAlbumTray() {
+    private func handleAlbumTray() {
         self.isDragEnabled = false
         
         self.shouldAddToAlbum { (shouldAdd, album) in
             if let photoAlbum = album {
                 photoAlbum.add(self.asset) { (didAdd) in
                     print("[SUCCESS] Successfully Added Photo To Album Named: \(photoAlbum.name)")
-                    
-                    DispatchQueue.main.async {
-                        UIView.animate(withDuration: 0.25, animations: {
-                            self.shadowView.alpha = 1.0
-                            self.shadowView.transform = CGAffineTransform(scaleX: 1, y: 1)
-                            self.shadowView.center = self.contentView.center
-                        })
-                        
-                        if let albumTray = self.albumTray { albumTray.removeFromSuperview() }
-                    }
-                    
+                    self.dismissAlbumTray()
                     self.delegate?.didAddToAlbum(Photo: self.asset, Album: photoAlbum)
                 }
             }
             else {
-                DispatchQueue.main.async {
-                    UIView.animate(withDuration: 0.25, animations: {
-                        self.shadowView.alpha = 1.0
-                        self.shadowView.transform = CGAffineTransform(scaleX: 1, y: 1)
-                        self.shadowView.center = self.contentView.center
-                    })
-                    
-                    if let albumTray = self.albumTray { albumTray.removeFromSuperview() }
-                }
+                self.dismissAlbumTray()
             }
+        }
+    }
+    
+    private func dismissAlbumTray() {
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.25, animations: {
+                self.shadowView.alpha = 1.0
+                self.shadowView.transform = CGAffineTransform(scaleX: 1, y: 1)
+                self.shadowView.center = self.contentView.center
+            })
+            
+            if let albumTray = self.albumTray { albumTray.removeFromSuperview() }
         }
     }
 }
@@ -433,7 +427,7 @@ extension CardCell {
                 self.shadowView.center = CGPoint(x: self.contentView.center.x + translationPoint.x, y: self.contentView.center.y + translationPoint.y)
             }
             
-            if gestureRecognizer.state == .ended || gestureRecognizer.state == .cancelled { self.dismissAlbumTray() }
+            if gestureRecognizer.state == .ended || gestureRecognizer.state == .cancelled { self.handleAlbumTray() }
         }
         else {
             self.shouldSwipeAway(gestureRecognizer: gestureRecognizer) { (shouldSwipe, swipeDirection) in

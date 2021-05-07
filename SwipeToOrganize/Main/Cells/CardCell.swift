@@ -466,21 +466,21 @@ extension CardCell {
     }
     
     private func shouldAddToAlbum(completion: @escaping (Bool, Album?) -> ()) {
-        if let albumTray = self.albumTray {
-            // let cardCenter = self.convert(self.shadowView.center, to: albumTray)
-            
-            let touchCenter = self.panRecognizer.location(in: albumTray)
-            
-            for cellIndex in albumTray.collectionView.indexPathsForVisibleItems {
-                if let cellFrame = albumTray.collectionView.collectionViewLayout.layoutAttributesForItem(at: cellIndex)?.frame {
-                    if cellFrame.contains(touchCenter /* cardCenter */) {
-                        let cell = albumTray.collectionView.cellForItem(at: cellIndex) as! AlbumCell
-                        
-                        completion(true, cell.album)
-                    }
-                    else {
-                        completion(false, nil)
-                    }
+        guard let albumTray = self.albumTray else { print("[ERROR] Failed To Validate Album Tray."); return }
+
+        // let cardCenter = self.convert(self.shadowView.center, to: albumTray)
+        
+        let touchCenter = self.panRecognizer.location(in: albumTray)
+        
+        for cellIndex in albumTray.collectionView.indexPathsForVisibleItems {
+            if let cellFrame = albumTray.collectionView.collectionViewLayout.layoutAttributesForItem(at: cellIndex)?.frame {
+                if cellFrame.contains(touchCenter /* cardCenter */) {
+                    let cell = albumTray.collectionView.cellForItem(at: cellIndex) as! AlbumCell
+                    
+                    completion(true, cell.album)
+                }
+                else {
+                    completion(false, nil)
                 }
             }
         }

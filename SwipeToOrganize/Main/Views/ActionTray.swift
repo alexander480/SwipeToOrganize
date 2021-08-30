@@ -6,13 +6,15 @@
 //  Copyright © 2020 Alexander Lester. All rights reserved.
 //
 
+// MARK: TODO: Connect This To Card Cell
+
 import ALExt
 
 import UIKit
 
 protocol ActionTrayDelegate {
-    func didPressFavorite(_ shouldFavorite: Bool)
-    func didPressHide(_ shouldHide: Bool)
+    func didPressFavorite()
+    func didPressHide()
     func didPressDelete()
 }
 
@@ -28,6 +30,8 @@ class ActionTray: UIView {
     // var addToButton: UIButton
     
     var tapRecognizer: UITapGestureRecognizer!
+	
+	var delegate: ActionTrayDelegate?
     
     let symbols = Symbols()
     
@@ -133,7 +137,7 @@ class ActionTray: UIView {
         self.favoriteButton.layer.cornerRadius = 10
         self.favoriteButton.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 0, blur: 6, spread: 0)
         
-        let favoriteSymbol = symbols.configureSymbol(symbol: symbols.emptyHeartSymbol, size: 26, weight: .medium, color: .black)
+        let favoriteSymbol = symbols.configureSymbol(symbol: symbols.emptyHeartSymbol, size: 26, weight: .medium, color: .red)
         self.favoriteButton.setImage(favoriteSymbol, for: .normal)
         
         self.favoriteButton.addTarget(self, action: #selector(self.didTapFavoriteButton), for: .touchDragInside)
@@ -180,15 +184,15 @@ class ActionTray: UIView {
     }
     
     @objc func didTapDeleteButton(sender: UIButton!) {
-        
+		self.delegate?.didPressDelete()
     }
     
     @objc func didTapFavoriteButton(sender: UIButton!) {
-        
+		self.delegate?.didPressFavorite()
     }
     
     @objc func didTapHideButton(sender: UIButton!) {
-        
+		self.delegate?.didPressHide()
     }
     
     @objc func didTap(_ gestureRecognizer: UITapGestureRecognizer) {

@@ -23,7 +23,8 @@ class SwipeVC: UIViewController {
     
     let cardWidth = CGFloat(UIScreen.main.bounds.size.width - (50)) // (50) Represents The Side Section Insets
     let helper = PhotosHelper()
-    
+    let symbols = Symbols()
+	
     var assets = [Asset]()
 
 	// MARK: Outlets
@@ -40,6 +41,7 @@ class SwipeVC: UIViewController {
         // Setup Accessory Views
         self.setupLoadingView()
         self.actionTray = ActionTray(frame: self.view.frame)
+		self.actionTray.delegate = self
         
         // Fetch Assets
         self.helper.fetchAssets { (assets) in
@@ -151,6 +153,87 @@ extension SwipeVC: CardCellDelegate {
             self.presentAlert(Title: "Successfully Added Photo To Album", Message: "This photo has been added to a photo album named \(albumName)", Actions: nil)
         }
     }
+}
+
+extension SwipeVC: ActionTrayDelegate {
+	func didPressFavorite() {
+		guard let visibleCells = self.collectionView.visibleCells as? [CardCell] else {
+			print("[ERROR] Failed To Validate Visible Cells.")
+			return
+		}
+		
+		guard let visibleCell = visibleCells.first else {
+			print("[ERROR] Failed To Validate Visible Cell.")
+			return
+		}
+		
+		let shouldFavorite = !visibleCell.asset.isFavorite
+		visibleCell.asset.setFavorite(shouldFavorite) { didUpdate in
+			if (didUpdate) {
+				print("[INFO] Successfully Updated Favorite Status For Asset.")
+				
+				let favoriteSymbol = (shouldFavorite == true) ? self.symbols.filledHeartSymbol : self.symbols.emptyHeartSymbol
+				let newSymbol = self.symbols.configureSymbol(symbol: favoriteSymbol, size: 26, weight: .medium, color: .red)
+				DispatchQueue.main.async { self.actionTray.favoriteButton.setImage(newSymbol, for: .normal) }
+			}
+			else {
+				print("[ERROR] Failed To Update Favorite Status For Asset.")
+			}
+		}
+	}
+	
+	func didPressHide() {
+		guard let visibleCells = self.collectionView.visibleCells as? [CardCell] else {
+			print("[ERROR] Failed To Validate Visible Cells.")
+			return
+		}
+		
+		guard let visibleCell = visibleCells.first else {
+			print("[ERROR] Failed To Validate Visible Cell.")
+			return
+		}
+		
+		let shouldHide = !visibleCell.asset.isHidden
+		visibleCell.asset.setHide(shouldHide) { didUpdate in
+			if (didUpdate) {
+				print("[INFO] Successfully Updated Hidden Status For Asset.")
+			}
+			else {
+				print("[ERROR] Failed To Hide Asset.")
+			}
+		}
+	}
+	
+	func didPressDelete() {
+		guard let visibleCells = self.collectionView.visibleCells as? [CardCell] else {
+			print("[ERROR] Failed To Validate Visible Cells.")
+			return
+		}
+		
+		guard let visibleCell = visibleCells.first else {
+			print("[ERROR] Failed To Validate Visible Cell.")
+			return
+		}
+		
+		visibleCell.asset.delete { didDelete in
+			if (didDelete) {
+				DispatchQueue.main.async {
+					print("[INFO] Successfully Deleted Asset")
+					self.view.displayToast("Asset Deleted")
+					
+					self.assets.remove(at: visibleCell.indexPath.row)
+					self.collectionView.deleteItems(at: [visibleCell.indexPath])
+					
+					self.collectionView.reloadData()
+				}
+			}
+			else {
+				print("[ERROR] Failed To Delete Asset.")
+			}
+		}
+	}
+	
+	
 }
 
 // MARK: UICollectionView Protocols

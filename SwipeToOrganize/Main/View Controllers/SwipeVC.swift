@@ -244,6 +244,16 @@ extension SwipeVC: UICollectionViewDelegateFlowLayout {
     }
 }
 
+extension SwipeVC: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        
+        let cellAsset = self.assets[indexPath.row]
+        self.actionTray.asset = cellAsset
+        
+        
+    }
+}
+
 extension SwipeVC: UICollectionViewDataSource {
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let card = self.collectionView.dequeueReusableCell(withReuseIdentifier: "CardCell", for: indexPath) as! CardCell

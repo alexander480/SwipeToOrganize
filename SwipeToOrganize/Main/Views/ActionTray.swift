@@ -34,6 +34,16 @@ class ActionTray: UIView {
 	var delegate: ActionTrayDelegate?
     
     let symbols = Symbols()
+    var asset: Asset? {
+        didSet {
+            // check to see if the asset is in favorites and if its hidden
+            if let asset = asset {
+                let favoriteSymbol = symbols.configureSymbol(symbol: asset.isFavorite ? symbols.filledHeartSymbol : symbols.emptyHeartSymbol, size: 26, weight: .medium, color: .red)
+                self.favoriteButton.setImage(favoriteSymbol, for: .normal)
+            }
+        }
+    }
+    
     
     override init(frame: CGRect) {
         
